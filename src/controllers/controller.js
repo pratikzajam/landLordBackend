@@ -109,7 +109,7 @@ export const login = async (req, res) => {
 
     if (!Userexists) {
       return res.status(400).json({
-        status: "failure",
+        status: false,
         message: "Email does not exists",
         data: null,
       });
@@ -128,7 +128,7 @@ export const login = async (req, res) => {
     if(PasswordMatch){
     
       return res.status(200).json({
-        status: "true",
+        status: true,
         message: "Logged in sucessfully",
         data: ResObject,
       });
