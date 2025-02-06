@@ -108,7 +108,7 @@ export const login = async (req, res) => {
     let Userexists = await User.findOne({ email: email })
 
     if (!Userexists) {
-      return res.status(400).json({
+      return res.status(200).json({
         status: false,
         message: "Email does not exists",
         data: null,
@@ -135,7 +135,7 @@ export const login = async (req, res) => {
     
     }else{
      
-      return res.status(400).json({
+      return res.status(200).json({
         status: "false",
         message: "password does not match",
         data: null,
