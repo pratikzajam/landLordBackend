@@ -206,9 +206,8 @@ export const addProperty = async (req, res) => {
 export const getProperties = async (req, res) => {
   try {
 
-    const properties = await property.find().sort({ createdAt: -1 }).exec(); // ✅ Force execution
+    const properties = await property.find().sort({ createdAt: -1 }).exec(); 
 
-    console.log("Sorted Properties:", properties.map(p => p.createdAt)); // Debugging log
 
     if (!properties || properties.length === 0) {
       return res.status(404).json({ status: false, message: "No properties found", data: [] });
@@ -224,4 +223,56 @@ export const getProperties = async (req, res) => {
     res.status(500).json({ status: false, message: "Server error", error: error.message });
   }
 };
+
+
+export const getPropertyCount = async (req, res) => {
+  try {
+
+    const properties = await property.find().sort({ createdAt: -1 }).exec(); 
+
+
+    if (!properties || properties.length === 0) {
+      return res.status(404).json({ status: false, message: "No properties found", data: [] });
+    }
+
+    return res.status(200).json({
+      status: true,
+      message: "Properties fetched successfully",
+      data: properties,
+    });
+  } catch (error) {
+    console.error("Error fetching properties:", error);
+    res.status(500).json({ status: false, message: "Server error", error: error.message });
+  }
+};
+
+export const getStats = async (req, res) => {
+  try {
+    const properties = await property.find().exec();
+
+    if (!properties || properties.length === 0) {
+      return res.status(404).json({ status: false, message: "No properties found", data: {} });
+    }
+
+    const totalProperties = properties.length;
+    const totalUnits = properties.reduce((sum, prop) => sum + (prop.units || 0), 0);
+    const totalOccupancy = properties.reduce((sum, prop) => sum + (prop.occupancy || 0), 0);
+
+    const averageOccupancy = totalProperties > 0 ? (totalOccupancy / totalProperties).toFixed(2) : 0;
+
+    return res.status(200).json({
+      status: true,
+      message: "Property statistics fetched successfully",
+      data: {
+        totalProperties,
+        totalUnits,
+        averageOccupancy: `${averageOccupancy}%`,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching property statistics:", error);
+    res.status(500).json({ status: false, message: "Server error", error: error.message });
+  }
+};
+
 
