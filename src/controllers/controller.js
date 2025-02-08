@@ -1,8 +1,11 @@
 import express from "express"
 import { Url } from "../models/urlModel.js"
 import { User } from "../models/userModel.js"
+import { property } from "../models/propertyModel.js"
 import { nanoid } from 'nanoid'
 import bcrypt from 'bcryptjs'
+
+
 
 
 
@@ -115,26 +118,26 @@ export const login = async (req, res) => {
       });
     }
 
-   let  ResObject={
-      name:Userexists.name,
-      email:Userexists.email,
-      userType:Userexists.userType
+    let ResObject = {
+      name: Userexists.name,
+      email: Userexists.email,
+      userType: Userexists.userType
     }
 
     let HashedPassword = Userexists.password
 
     let PasswordMatch = bcrypt.compareSync(password, HashedPassword);
 
-    if(PasswordMatch){
-    
+    if (PasswordMatch) {
+
       return res.status(200).json({
         status: true,
         message: "Logged in sucessfully",
         data: ResObject,
       });
-    
-    }else{
-     
+
+    } else {
+
       return res.status(200).json({
         status: "false",
         message: "password does not match",
@@ -154,4 +157,71 @@ export const login = async (req, res) => {
 
 }
 
+
+
+export const addProperty = async (req, res) => {
+  try {
+    const { title, address, totalUnits, occupancy, revenue } = req.body;
+
+    
+    if (!title || !address || !totalUnits || !occupancy || !revenue || !req.file) {
+      return res.status(400).json({ status: false, message: "All fields are required!", data: null });
+    }
+
+    
+    console.log("Uploaded File Details:", req.file);
+
+
+    const serverUrl = `${req.protocol}://${req.get("host")}`;
+    const imageUrl = `${serverUrl}/uploads/${req.file.filename}`;
+
+   
+
+    
+    const propertyData = {
+      title,
+      address,
+      units:totalUnits,
+      occupancy,
+      revenue,
+      image_url: imageUrl, 
+    };
+
+    
+    const newProperty = await property.create(propertyData);
+
+    return res.status(201).json({
+      status: true,
+      message: "Property created successfully!",
+      data: newProperty
+    });
+
+  } catch (error) {
+    console.error("Error creating property:", error);
+    res.status(500).json({ status: false, message: "Server error", error: error.message });
+  }
+};
+
+
+export const getProperties = async (req, res) => {
+  try {
+    // Fetch all properties from the database
+    const properties = await property.find().sort({ createdAt: -1 }).exec(); // ✅ Force execution
+
+    console.log("Sorted Properties:", properties.map(p => p.createdAt)); // Debugging log
+
+    if (!properties || properties.length === 0) {
+      return res.status(404).json({ status: false, message: "No properties found", data: [] });
+    }
+
+    return res.status(200).json({
+      status: true,
+      message: "Properties fetched successfully",
+      data: properties,
+    });
+  } catch (error) {
+    console.error("Error fetching properties:", error);
+    res.status(500).json({ status: false, message: "Server error", error: error.message });
+  }
+};
 
