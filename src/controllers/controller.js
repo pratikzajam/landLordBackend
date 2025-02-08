@@ -275,4 +275,30 @@ export const getStats = async (req, res) => {
   }
 };
 
+export const deleteProperty = async (req, res) => {
+  try {
+    const { id } = req.params; // Get property ID from request parameters
+
+    if (!id) {
+      return res.status(400).json({ status: false, message: "Property ID is required" });
+    }
+
+    const deletedProperty = await property.findByIdAndDelete(id);
+
+    if (!deletedProperty) {
+      return res.status(404).json({ status: false, message: "Property not found" });
+    }
+
+    return res.status(200).json({
+      status: true,
+      message: "Property deleted successfully",
+      data: deletedProperty,
+    });
+  } catch (error) {
+    console.error("Error deleting property:", error);
+    res.status(500).json({ status: false, message: "Server error", error: error.message });
+  }
+};
+
+
 
