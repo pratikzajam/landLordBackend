@@ -139,7 +139,7 @@ export const login = async (req, res) => {
     } else {
 
       return res.status(200).json({
-        status: "false",
+        status: false,
         message: "password does not match",
         data: null,
       });
@@ -205,7 +205,7 @@ export const addProperty = async (req, res) => {
 
 export const getProperties = async (req, res) => {
   try {
-    // Fetch all properties from the database
+
     const properties = await property.find().sort({ createdAt: -1 }).exec(); // ✅ Force execution
 
     console.log("Sorted Properties:", properties.map(p => p.createdAt)); // Debugging log
